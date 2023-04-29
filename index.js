@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-  authed = true//res.locals.authed
+  authed = res.locals.authed
   if (authed) {
     res.redirect('/home')
   } else {

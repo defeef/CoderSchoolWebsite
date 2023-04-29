@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { createHash, randomUUID } = import('crypto');
+const crypto = require('crypto'); 
 
 const get_data = () => {
     const file = fs.readFileSync('database.json')
@@ -21,7 +21,10 @@ const get_user_by_email = (email) => {
     if (db.emails[email] === undefined) {
         return undefined
     }
-    return db.users[db.emails[email]]
+    const user_id = db.emails[email]
+    var user = db.users[user_id]
+    user.user_id = user_id
+    return user
 }
 
 const get_user_by_username = (username) => {
@@ -33,11 +36,47 @@ const get_user_by_username = (username) => {
     if (db.usernames[username] === undefined) {
         return undefined
     }
-    return db.users[db.usernames[username]]
+    const user_id = db.usernames[username]
+    var user = db.users[user_id]
+    user.user_id = user_id
+    return user
 }
 
 const sanitize = (input) => {
     return input.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+const create_hash = (input) => {
+    var sha = crypto.createHash('sha512')
+    sha.update(input)
+    return sha.digest('hex')
+}
+
+const login = (username, password) => {
+    username = sanitize(username)
+    password = sanitize(password)
+
+    user = get_user_by_username(username)
+    if (user === undefined) {
+        return [400, 'Username does not exist']
+    }
+
+    const hash = create_hash(password + user.user_id)
+    if (user.password !== hash) {
+        return [400, 'Password does not match']
+    }
+
+    var db = get_data()
+    if (db.sessions == undefined) {
+        db.sessions = {}
+    }
+
+    const token = crypto.randomUUID()
+    db.sessions[token] = user.user_id
+    
+    write_data(db)
+
+    return [200, 'Successfully logged in', token]
 }
 
 const register = (first, last, email, username, password) => {
@@ -55,9 +94,9 @@ const register = (first, last, email, username, password) => {
         return [400, 'The email is already in use']
     }
 
-    const db = get_data()
+    var db = get_data()
     if (db.users == undefined) {
-        db.users = {}
+        db.users = []
     }
 
     if (db.emails == undefined) {
@@ -68,9 +107,13 @@ const register = (first, last, email, username, password) => {
         db.usernames = {}
     }
 
-    const hash = createHash('sha512').update(password + user_id).digest();
+    if (db.sessions == undefined) {
+        db.sessions = {}
+    }
 
-    const user_id = users.length
+    const user_id = db.users.length
+    const hash = create_hash(password + user_id)
+
     db.emails[email] = user_id
     db.usernames[username] = user_id
     db.users.push({
@@ -81,37 +124,12 @@ const register = (first, last, email, username, password) => {
         password: hash
     })
 
-    const token = randomUUID()
-    db.sessions[token] = db.usernames[username]
+    const token = crypto.randomUUID()
+    db.sessions[token] = user_id
 
     write_data(db)
 
     return [200, 'Successfully registered user', token]
-}
-
-const login = (username, password) => {
-    username = sanitize(username)
-    password = sanitize(password)
-
-    user = get_user_by_username(username)
-    if (user === undefined) {
-        return [400, 'Username does not exist']
-    }
-
-    if (user.password !== password) {
-        return [400, 'Password does not match']
-    }
-
-    if (db.sessions == undefined) {
-        db.sessions = {}
-    }
-
-    const token = randomUUID()
-    db.sessions[token] = db.usernames[username]
-    
-    write_data(db)
-
-    return [200, 'Successfully logged in', token]
 }
 
 module.exports = {
