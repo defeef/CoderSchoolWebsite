@@ -25,7 +25,6 @@ main {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    height: 300px;
 }
 
 main span {
@@ -39,48 +38,6 @@ a {
 
 a:hover {
     color: #5b5b9d;
-}
-
-#login {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    background-color: #1d1b2b;
-    border-radius: 10px;
-}
-
-#register {
-    margin-top: 100px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    background-color: #1d1b2b;
-    border-radius: 10px;
-}
-
-#post {
-    margin-top: 10px;
-    margin-bottom: 15px;
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #1d1b2b;
-    border-radius: 10px;
-    font-size: 15px;
-    width: 75%;
-}
-
-#resBar {
-    display: flex;
-    margin-top: 5px;
-    width: 100%;
-    text-align: center;
-}
-
-#react {
-    flex-basis: 0;
-    flex-grow: 1;
 }
 
 input {

@@ -1,0 +1,41 @@
+.post {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color:#1d1b2b;
+    border-radius: 10px;
+    outline: solid 5px #232137;
+    font-size: 15px;
+    width: 75%;
+}
+
+.resBar {
+    display: flex;
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
+}
+
+.react {
+    flex-basis: 0;
+    flex-grow: 1;
+
+    background-color:#1d1b2b;
+    border: none;
+    color: #4b4b8d;
+    padding: 15px 32px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.react:hover {
+    background-color: #2d2b4b;
+}
+
+.react:active {
+    background-color: #232137;
+}

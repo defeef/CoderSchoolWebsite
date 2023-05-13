@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   next()
 })
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   authed = res.locals.authed
   if (authed) {
     res.redirect('/home')
@@ -51,37 +51,38 @@ const cookie_options = {
   httpOnly: true,
 }
 
-app.get('/login', (req, res) => {
+app.get('/login', (_req, res) => {
   res.sendFile('/login.html', {root: './public' })
 })
 
-app.get('/register', (req, res) => {
+app.get('/register', (_req, res) => {
   res.sendFile('/register.html', {root: './public' })
 })
 
-app.get('/home', (req, res) => {
+app.get('/home', (_req, res) => {
   res.sendFile('/home.html', {root: './public' })
-})
-
-app.post('/register', (req, res) => {
-  
 })
 
 app.post('/api/register', (req, res) => {
   if (req.body.first === undefined) {
     res.status(400).send('Missing first name')
+    return
   }
   if (req.body.last === undefined) {
     res.status(400).send('Missing last name')
+    return
   }
   if (req.body.username === undefined) {
     res.status(400).send('Missing username')
+    return
   }
   if (req.body.email === undefined) {
     res.status(400).send('Missing email')
+    return
   }
   if (req.body.password === undefined) {
     res.status(400).send('Missing password')
+    return
   }
   const[code, msg, token] = db.register(
     req.body.first,
@@ -97,15 +98,37 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
   if (req.body.username === undefined) {
     res.status(400).send('Missing username')
+    return
   }
   if (req.body.password === undefined) {
     res.status(400).send('Missing password')
+    return
   }
   const[code, msg, token] = db.login(
     req.body.username,
     req.body.password
   )
   res.cookie('auth', token, cookie_options).status(code).send(msg)
+})
+
+app.get('/api/post', (_req, res) => {
+  const [code, result] = db.get_posts()
+  res.status(code).send(result)
+})
+
+// !!TESTING ONLY!!
+app.get('/api/test_post', (_req, res) => {
+  db.create_post(0, 'test')
+  res.status(200).send('ok')
+})
+
+app.get('api/user', (req, res) => {
+  if (req.body.user_id === undefined || typeof req.body.user_id != 'number' || res.body.user_id < 0) {
+    res.status(400).send('Missing user id')
+    return
+  }
+  const [code, result] = db.get_user(req.body.user_id)
+  res.status(code).send(result)
 })
 
 app.listen(port, () => {

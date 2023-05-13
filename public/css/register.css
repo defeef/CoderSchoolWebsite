@@ -1,0 +1,8 @@
+#register {
+    margin-top: 100px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: #1d1b2b;
+    border-radius: 10px;
+}

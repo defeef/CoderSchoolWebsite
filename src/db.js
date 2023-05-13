@@ -42,6 +42,31 @@ const get_user_by_username = (username) => {
     return user
 }
 
+const get_user = (user_id) => {
+    var db = get_data()
+    var users = db.users
+    if (users === undefined) {
+        return [404, []]
+    }
+
+    if (users.length < user_id) {
+        return [404, []]
+    }
+
+    return [200, users[user_id]]
+}
+
+const get_posts = () => {
+    var db = get_data()
+    var posts = db.posts
+
+    if (posts == undefined) {
+        return [200, []]
+    } else {
+        return [200, posts]
+    }
+}
+
 const sanitize = (input) => {
     return input.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
@@ -76,7 +101,7 @@ const login = (username, password) => {
     
     write_data(db)
 
-    return [200, 'Successfully logged in', token]
+    return [201, 'Successfully logged in', token]
 }
 
 const register = (first, last, email, username, password) => {
@@ -129,12 +154,39 @@ const register = (first, last, email, username, password) => {
 
     write_data(db)
 
-    return [200, 'Successfully registered user', token]
+    return [201, 'Successfully registered user', token]
+}
+
+const create_post = (user_id, content) => {
+    var db = get_data()
+
+    if (get_user(user_id)[0] != 200 || db.users.length < user_id) {
+        return [404, 'User does not exist']
+    }
+
+    if (content === undefined) {
+        return [400, 'Content is required']
+    }
+
+    if (db.posts === undefined) {
+        db.posts = []
+    }
+
+    db.posts.push({
+        user_id,
+        content
+    })
+
+    write_data(db)
+
+    return [201, 'Successfully created post']
 }
 
 module.exports = {
+    get_data,
+    get_posts,
+    get_user,
     login,
     register,
-    get_data,
-
+    create_post
 }

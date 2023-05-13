@@ -6,7 +6,13 @@ async function login(event) {
     const password = data.password.value
 
     let response = await api_login(username, password)
-    alert(response.msg)
+    
+    if (response.status != 201) {
+        alert(response.msg)
+        return
+    }
+
+    location.href = "/home"
 }
 
 async function register(event) {
@@ -21,5 +27,11 @@ async function register(event) {
     const confirm = data.confirm.value
 
     let response = await api_register(first, last, email, username, password, confirm)
-    alert(response.msg)
+    
+    if (response.status != 201) {
+        alert(response.msg)
+        return
+    }
+
+    location.href = "/home"
 }
