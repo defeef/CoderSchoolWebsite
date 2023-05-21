@@ -28,3 +28,15 @@ const api_register = (first, last, email, username, password) => {
 const api_login = (username, password) => {
     return request('/login', { username, password }, 'POST')
 }
+
+const api_create_post = (content) => {
+    return request('/post', { content }, 'POST')
+}
+
+const api_get_posts = () => {
+    return request('/posts', {}, 'POST')
+}
+
+const api_get_user = (user_id) => {
+    return request('/user', {user_id}, 'POST')
+}

@@ -46,11 +46,11 @@ const get_user = (user_id) => {
     var db = get_data()
     var users = db.users
     if (users === undefined) {
-        return [404, []]
+        return [404, {}]
     }
 
-    if (users.length < user_id) {
-        return [404, []]
+    if (users.length <= user_id) {
+        return [404, {}]
     }
 
     return [200, users[user_id]]
@@ -160,20 +160,15 @@ const register = (first, last, email, username, password) => {
 const create_post = (user_id, content) => {
     var db = get_data()
 
-    if (get_user(user_id)[0] != 200 || db.users.length < user_id) {
-        return [404, 'User does not exist']
-    }
-
-    if (content === undefined) {
-        return [400, 'Content is required']
-    }
-
     if (db.posts === undefined) {
         db.posts = []
     }
 
+    var post_id = db.posts.length
+
     db.posts.push({
         user_id,
+        post_id,
         content
     })
 

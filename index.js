@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   next()
 })
 
-app.get('/', (_req, res) => {
+app.get('/', (_, res) => {
   authed = res.locals.authed
   if (authed) {
     res.redirect('/home')
@@ -51,15 +51,15 @@ const cookie_options = {
   httpOnly: true,
 }
 
-app.get('/login', (_req, res) => {
+app.get('/login', (_, res) => {
   res.sendFile('/login.html', {root: './public' })
 })
 
-app.get('/register', (_req, res) => {
+app.get('/register', (_, res) => {
   res.sendFile('/register.html', {root: './public' })
 })
 
-app.get('/home', (_req, res) => {
+app.get('/home', (_, res) => {
   res.sendFile('/home.html', {root: './public' })
 })
 
@@ -111,19 +111,34 @@ app.post('/api/login', (req, res) => {
   res.cookie('auth', token, cookie_options).status(code).send(msg)
 })
 
-app.get('/api/post', (_req, res) => {
+app.get('/api/posts', (_, res) => {
   const [code, result] = db.get_posts()
   res.status(code).send(result)
 })
 
-// !!TESTING ONLY!!
-app.get('/api/test_post', (_req, res) => {
-  db.create_post(0, 'test')
-  res.status(200).send('ok')
+app.use((_, res, next) => {
+  if (!res.locals.authed) {
+    res.status(401).send("Unauthorized")
+    return
+  }
+  next()
 })
 
-app.get('api/user', (req, res) => {
-  if (req.body.user_id === undefined || typeof req.body.user_id != 'number' || res.body.user_id < 0) {
+app.post('/api/posts', (req, res) => {
+  if (req.body.content === undefined || typeof req.body.content !== 'string' || req.body.content.length >= 256) {
+    res.status(400).send('Missing content')
+    return
+  }
+
+  const [code, result] = db.create_post(
+    res.locals.user_id,
+    req.body.content
+  )
+  res.status(code).send(result)
+})
+
+app.post('api/user', (req, res) => {
+  if (req.body.user_id === undefined || typeof req.body.user_id != 'number' || req.body.user_id < 0) {
     res.status(400).send('Missing user id')
     return
   }
