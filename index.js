@@ -124,7 +124,7 @@ app.use((_, res, next) => {
   next()
 })
 
-app.post('/api/posts', (req, res) => {
+app.post('/api/post', (req, res) => {
   if (req.body.content === undefined || typeof req.body.content !== 'string' || req.body.content.length >= 256) {
     res.status(400).send('Missing content')
     return

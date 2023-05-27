@@ -1,10 +1,16 @@
+import { p, h, div, parse } from './main.js'
+
 function create_post(post, user) {
-    return (`
-        <div>
-            <h3>${user.first} ${user.last} ${user.username}</h3>
-            <p>${post.content}</p>
-        </div>
-    `)
+    return (
+        div({ class: 'post' },
+            h(3, {},
+                parse(`${user.first} ${user.last} (${user.username})`),
+            ),
+            p({},
+                parse(`${post.content}`)
+            )
+        )
+    )
 }
 
 async function load() {
@@ -34,8 +40,9 @@ async function load() {
 
     var block = document.getElementById('posts')
     for (var post of posts) {
-        block.appendChild(
-            create_post(post, users[post.user_id]).html()
-        )
+        var element = create_post(post, users[post.user_id])
+        block.appendChild(element)
     }
 }
+
+load()
