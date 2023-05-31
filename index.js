@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     return
   }
 
-  var sessions = db.get_data().sessions
+  var sessions = db.get_sessions()
   if (sessions === undefined) {
     sessions = []
   }
@@ -28,6 +28,7 @@ app.use((req, res, next) => {
     res.locals.authed = false
   } else {
     res.locals.authed = true
+    res.locals.token = token
     res.locals.user_id = id
   }
 
@@ -104,16 +105,17 @@ app.post('/api/login', (req, res) => {
     res.status(400).send('Missing password')
     return
   }
-  const[code, msg, token] = db.login(
+  const [code, msg, token] = db.login(
     req.body.username,
     req.body.password
   )
   res.cookie('auth', token, cookie_options).status(code).send(msg)
 })
 
-app.get('/api/posts', (_, res) => {
-  const [code, result] = db.get_posts()
-  res.status(code).send(result)
+app.delete('/api/logout', (req, res) => {
+  const token = req.cookies.auth
+  const [code, msg] = db.logout(token)
+  res.status(code).send(msg)
 })
 
 app.use((_, res, next) => {
@@ -122,6 +124,11 @@ app.use((_, res, next) => {
     return
   }
   next()
+})
+
+app.post('/api/posts', (_, res) => {
+  const [code, result] = db.get_posts()
+  res.status(code).send(result)
 })
 
 app.post('/api/post', (req, res) => {
@@ -137,7 +144,7 @@ app.post('/api/post', (req, res) => {
   res.status(code).send(result)
 })
 
-app.post('api/user', (req, res) => {
+app.post('/api/user', (req, res) => {
   if (req.body.user_id === undefined || typeof req.body.user_id != 'number' || req.body.user_id < 0) {
     res.status(400).send('Missing user id')
     return

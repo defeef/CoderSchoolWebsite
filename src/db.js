@@ -1,10 +1,16 @@
 const fs = require('fs')
-const crypto = require('crypto'); 
+const crypto = require('crypto');
+
+var sessions = {}
 
 const get_data = () => {
-    const file = fs.readFileSync('database.json')
-    const db = JSON.parse(file)
-    return db
+    try {
+        const file = fs.readFileSync('database.json')
+        const db = JSON.parse(file)
+        return db
+    } catch (_) {
+        return {}
+    }
 }
 
 const write_data = (db) => {
@@ -91,17 +97,15 @@ const login = (username, password) => {
         return [400, 'Password does not match']
     }
 
-    var db = get_data()
-    if (db.sessions == undefined) {
-        db.sessions = {}
-    }
-
     const token = crypto.randomUUID()
-    db.sessions[token] = user.user_id
-    
-    write_data(db)
+    sessions[token] = user.user_id
 
     return [201, 'Successfully logged in', token]
+}
+
+const logout = (token) => {
+    sessions[token] = undefined
+    return [200, 'Successfully logged out']
 }
 
 const register = (first, last, email, username, password) => {
@@ -132,10 +136,6 @@ const register = (first, last, email, username, password) => {
         db.usernames = {}
     }
 
-    if (db.sessions == undefined) {
-        db.sessions = {}
-    }
-
     const user_id = db.users.length
     const hash = create_hash(password + user_id)
 
@@ -150,7 +150,7 @@ const register = (first, last, email, username, password) => {
     })
 
     const token = crypto.randomUUID()
-    db.sessions[token] = user_id
+    sessions[token] = user_id
 
     write_data(db)
 
@@ -177,11 +177,17 @@ const create_post = (user_id, content) => {
     return [201, 'Successfully created post']
 }
 
+const get_sessions = () => {
+    return sessions;
+}
+
 module.exports = {
     get_data,
     get_posts,
     get_user,
     login,
+    logout,
     register,
-    create_post
+    create_post,
+    get_sessions
 }

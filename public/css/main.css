@@ -52,3 +52,26 @@ footer {
 span, div {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
+
+button {
+    background-color: #9b9bbd;
+    border: 2px solid #5b5b9d;
+}
+
+button:hover {
+    background-color: #7676b7;
+    border-color: #2d2b4b;
+}
+
+button:focus {
+    outline: 1px solid #aaaacc;
+}
+
+input {
+    background-color: #9b9bbd;
+    border: 2px solid #5b5b9d;
+}
+
+input:focus {
+    outline: 1px solid #aaaacc;
+}

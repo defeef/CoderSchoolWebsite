@@ -29,6 +29,15 @@ const api_login = (username, password) => {
     return request('/login', { username, password }, 'POST')
 }
 
+const api_logout = async () => {
+    const response = await request('/logout', {}, 'DELETE')
+    if (response.status != 200) {
+        alert(response.msg)
+    } else {
+        location.href = '/login'
+    }
+}
+
 const api_create_post = (content) => {
     return request('/post', { content }, 'POST')
 }

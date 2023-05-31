@@ -27,7 +27,7 @@ async function load() {
     console.log(posts.length)
 
     for (var post of posts) {
-        if (usrs[post.user_id] !== undefined) continue
+        if (users[post.user_id] !== undefined) continue
 
         var user_response = await api_get_user(post.user_id)
         if (user_response.status != 200) {
